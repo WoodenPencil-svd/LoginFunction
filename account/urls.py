@@ -4,6 +4,6 @@ from login.views import HomeView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('login/', include('login.urls')),
+    path('', include('login.urls')),
     path('', HomeView.as_view(), name='home'), 
 ]

@@ -1,12 +1,12 @@
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import FormView, RedirectView
+from django.views.generic import FormView, RedirectView,TemplateView
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse
-from django.contrib import messages
-from django.views.generic import TemplateView
+
+
 
 
 class HomeView(TemplateView):
@@ -23,7 +23,6 @@ class LoginView(FormView):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            messages.success(request,'Logged in successfully')
             return redirect(self.get_success_url())
         else:
             return HttpResponse('Cannot find user, Do you have account yet ?')
@@ -42,4 +41,5 @@ class SignupView(FormView):
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
+    
     
