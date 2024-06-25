@@ -17,23 +17,18 @@ class LoginView(FormView):
     success_url = reverse_lazy('home')
     form_class = AuthenticationForm
 
-    def form_valid(self, form):
+    def post(self, request, *args, **kwargs):
+      form = self.get_form()
+      if form.is_valid():
         username = form.cleaned_data['username']
         password = form.cleaned_data['password']
         user = authenticate(self.request, username=username, password=password)
         if user is not None:
             login(self.request, user)
             return redirect(self.get_success_url())
+      return self.render_to_response(self.get_context_data(form=form))
 
-    def form_invalid(self, form):
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def post(self, request, *args, **kwargs):
-        form = self.get_form()
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
+    
 
 
 class LogoutView(RedirectView):
