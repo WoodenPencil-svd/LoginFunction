@@ -3,8 +3,7 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import FormView, RedirectView,TemplateView
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import UserCreationForm
-from django.http import HttpResponse
+from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
 
 
 
@@ -12,20 +11,30 @@ from django.http import HttpResponse
 class HomeView(TemplateView):
     template_name = 'home/index.html'
     
+
 class LoginView(FormView):
     template_name = 'accounts/login.html'
     success_url = reverse_lazy('home')
-    form_class = UserCreationForm
+    form_class = AuthenticationForm
+
+    def form_valid(self, form):
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+        user = authenticate(self.request, username=username, password=password)
+        if user is not None:
+            login(self.request, user)
+            return redirect(self.get_success_url())
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
 
     def post(self, request, *args, **kwargs):
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect(self.get_success_url())
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
         else:
-            return HttpResponse('Cannot find user, Do you have account yet ?')
+            return self.form_invalid(form)
+
 
 class LogoutView(RedirectView):
     url = reverse_lazy('home')
