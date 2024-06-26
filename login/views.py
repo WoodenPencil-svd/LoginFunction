@@ -29,13 +29,12 @@ class LoginView(FormView):
       return self.render_to_response(self.get_context_data(form=form))
 
     
-
-
 class LogoutView(RedirectView):
     url = reverse_lazy('home')
     def get(self, request, *args, **kwargs):
         logout(request)
-        return super().get(request, *args, **kwargs)
+        return redirect(self.url)
+
 
 class SignupView(FormView):
     template_name = 'accounts/signup.html'
@@ -44,6 +43,6 @@ class SignupView(FormView):
 
     def form_valid(self, form):
         form.save()
-        return super().form_valid(form)
+        return redirect(self.get_success_url())
     
     
